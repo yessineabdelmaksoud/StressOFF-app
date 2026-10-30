@@ -1,7 +1,6 @@
 /// This service handles all communication between the Flutter app and
-/// Firebase (Firestore + Storage) AND the AI backend server.
+/// Firebase (Firestore + Storage).
 /// Its responsibilities include:
-///      • Calling the AI backend to get event recommendations
 ///       • Compressing and encoding images (free, local solution)
 ///      • Uploading profile images to Firebase Storage
 ///      • Saving and retrieving meal analyses from Firestore
@@ -19,42 +18,11 @@ import 'package:flutter/foundation.dart';
 import 'package:image/image.dart' as img;
 import '../models/meal_models.dart';
 import '../models/health_models.dart';
-import 'api_config.dart';
-import 'package:http/http.dart' as http;
 
 
 class FirebaseService {
   static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   static final FirebaseStorage _storage = FirebaseStorage.instance;
-  static const String baseUrl = mealServiceBaseUrl;
-
-  /// AI BACKEND  — GENERATE EVENT RECOMMENDATION
-  /// Sends event info to the AI server and receives recommendation
-  static Future<EventRecommendation?> getEventRecommendation(
-      String eventTitle,
-      DateTime startTime,
-      DateTime endTime,
-      ) async {
-    try {
-      final response = await http.post(
-        Uri.parse('$baseUrl/generate-event-recommendation'),
-        headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({
-          'eventTitle': eventTitle,
-          'startTime': startTime.toIso8601String(),
-          'endTime': endTime.toIso8601String(),
-        }),
-      );
-
-      if (response.statusCode == 200) {
-        return EventRecommendation.fromJson(jsonDecode(response.body));
-      }
-      return null;
-    } catch (e) {
-      print('Error getting event recommendation: $e');
-      return null;
-    }
-  }
 
   /// IMAGE HANDLING — COMPRESS AND CONVERT TO BASE64
   /// Used to send image to backend or store locally without Firebase Storage

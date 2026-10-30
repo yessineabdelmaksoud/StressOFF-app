@@ -7,6 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import '../models/health_models.dart';
 import '../services/firebase_service.dart';
 import '../services/health_analysis_service.dart';
+import '../services/event_service.dart';
 import '../main.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -205,13 +206,15 @@ class _HealthcarePageState extends State<HealthcarePage> {
 
       List<EventRecommendation> recommendations = [];
       for (var event in events) {
-        final recommendation = await FirebaseService.getEventRecommendation(
-          event.title,
-          event.startTime,
-          event.endTime,
-        );
-        if (recommendation != null) {
-          recommendations.add(recommendation);
+        try {
+          final data = await EventService.generateEventRecommendation(
+            eventTitle: event.title,
+            startTime: event.startTime,
+            endTime: event.endTime,
+          );
+          recommendations.add(EventRecommendation.fromJson(data));
+        } catch (e) {
+          print('Error getting event recommendation: $e');
         }
       }
 

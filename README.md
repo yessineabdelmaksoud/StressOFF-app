@@ -407,7 +407,6 @@ StressOFF is a challenge prototype. Known gaps, all visible in the code:
 - **Backend auth**: the services do not verify Firebase ID tokens, and CORS allows all origins. Adding token verification (for example with `firebase-admin`) is the first step before any real deployment.
 - **Transport**: services are exposed over plain HTTP on ACI; HTTPS (Azure Front Door, Application Gateway or a reverse proxy) is not configured.
 - **Wearable integration**: health data comes from the smartwatch simulator; there is no Health Connect, HealthKit or vendor SDK integration yet.
-- **Event recommendations**: the healthcare page calls `/generate-event-recommendation` through `FirebaseService`, which targets the meal service URL. The dedicated `EventService` client using `EVENT_SERVICE_URL` exists but is not wired in.
 - **Free-tier models**: all calls use OpenRouter `:free` models, which are rate limited.
 - **Testing and CI**: no backend tests, an outdated Flutter template test, and no CI pipeline.
 - **Missing script**: the event service README mentions a `deploy.ps1` that is not in the repository.
