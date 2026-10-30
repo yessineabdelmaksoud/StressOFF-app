@@ -66,7 +66,8 @@ migrate_working_dir/
 .flutter-plugins-dependencies
 .pub-cache/
 .pub/
-/build/
+# Build outputs at the root and inside platform folders (e.g. android/build)
+**/build/
 /coverage/
 
 # Symbolication related
