@@ -43,7 +43,21 @@ Health check endpoint.
 
 Service information and available endpoints.
 
+## Run locally
+
+From the repository root:
+
+```bash
+pip install -r backend/event_service/requirements.txt
+export OPENROUTER_API_KEY=<your-openrouter-key>
+uvicorn backend.event_service.main:app --host 0.0.0.0 --port 8003
+```
+
+On Windows: `.\backend\start.ps1 -Service event` (also port 8003).
+
 ## Deployment
+
+The service is deployed like the other three: one Docker image on Docker Hub, one Azure Container Instance. The container listens on port 8000.
 
 ### Prerequisites
 
@@ -52,43 +66,31 @@ Service information and available endpoints.
 - Docker Hub account
 - OpenRouter API key
 
-### Quick Deploy
-
-1. **Set environment variable:**
-```powershell
-$env:OPENROUTER_API_KEY = "your-api-key"
-```
-
-2. **Run deployment script:**
-```powershell
-cd backend/event_service
-.\deploy.ps1
-```
-
-### Manual Deployment
-
-**Build:**
-```powershell
-docker build -f backend/event_service/Dockerfile -t username/stressoff-event-service:latest .
-```
-
-**Push:**
-```powershell
-docker push username/stressoff-event-service:latest
+**Build and push** (from the repository root, because the Dockerfile copies `backend/common`):
+```bash
+docker build -f backend/event_service/Dockerfile -t <dockerhub-user>/event-service:v1.0.0 .
+docker login --username <dockerhub-user>
+docker push <dockerhub-user>/event-service:v1.0.0
 ```
 
 **Deploy to Azure:**
-```powershell
+```bash
+az login
+az account set --subscription <subscription-id>
+az group create --name stress-rg --location norwayeast
+
 az container create \
-  --resource-group stressoff-rg \
-  --name event-service \
-  --image username/stressoff-event-service:latest \
+  --resource-group stress-rg \
+  --name event-service-ci \
+  --image <dockerhub-user>/event-service:v1.0.0 \
   --dns-name-label eventservice \
-  --location norwayeast \
-  --cpu 1 --memory 1.5 \
   --ports 8000 \
-  --environment-variables OPENROUTER_API_KEY=$env:OPENROUTER_API_KEY \
-  --restart-policy Always
+  --registry-login-server index.docker.io \
+  --registry-username <dockerhub-user> \
+  --registry-password <dockerhub-token> \
+  --secure-environment-variables OPENROUTER_API_KEY=<your-openrouter-key> \
+  --os-type Linux --cpu 1 --memory 1.5 \
+  --location norwayeast
 ```
 
 ## Environment Variables
@@ -123,46 +125,18 @@ Invoke-RestMethod -Uri "http://eventservice.norwayeast.azurecontainer.io:8000/ge
 
 **View logs:**
 ```powershell
-az container logs --resource-group stressoff-rg --name event-service
+az container logs --resource-group stress-rg --name event-service-ci
 ```
 
 **Stream logs:**
 ```powershell
-az container logs --resource-group stressoff-rg --name event-service --follow
+az container logs --resource-group stress-rg --name event-service-ci --follow
 ```
 
 ## Integration
 
-Update Flutter app's API configuration:
+The Flutter app calls this service through [`lib/services/event_service.dart`](../../lib/services/event_service.dart), whose base URL comes from `EVENT_SERVICE_URL` in [`lib/services/api_config.dart`](../../lib/services/api_config.dart). Override it at build time:
 
-```dart
-// lib/services/api_config.dart
-const String eventServiceBaseUrl = 'http://eventservice.norwayeast.azurecontainer.io:8000';
-```
-
-Use in Flutter:
-```dart
-import 'package:http/http.dart' as http;
-import 'dart:convert';
-
-Future<Map<String, dynamic>> getEventRecommendation({
-  required String eventTitle,
-  required DateTime startTime,
-  required DateTime endTime,
-}) async {
-  final response = await http.post(
-    Uri.parse('$eventServiceBaseUrl/generate-event-recommendation'),
-    headers: {'Content-Type': 'application/json'},
-    body: jsonEncode({
-      'eventTitle': eventTitle,
-      'startTime': startTime.toIso8601String(),
-      'endTime': endTime.toIso8601String(),
-    }),
-  );
-  
-  if (response.statusCode == 200) {
-    return jsonDecode(response.body);
-  }
-  throw Exception('Failed to get recommendation');
-}
+```bash
+flutter run --dart-define=EVENT_SERVICE_URL=http://10.0.2.2:8003
 ```

@@ -409,7 +409,6 @@ StressOFF is a challenge prototype. Known gaps, all visible in the code:
 - **Wearable integration**: health data comes from the smartwatch simulator; there is no Health Connect, HealthKit or vendor SDK integration yet.
 - **Free-tier models**: all calls use OpenRouter `:free` models, which are rate limited.
 - **Testing and CI**: no backend tests, an outdated Flutter template test, and no CI pipeline.
-- **Missing script**: the event service README mentions a `deploy.ps1` that is not in the repository.
 - **Medical disclaimer**: StressOFF gives general wellness guidance and is not a medical device.
 
 ---
