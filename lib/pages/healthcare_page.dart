@@ -12,6 +12,7 @@ import '../main.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import '../services/calender_service.dart';
+import '../utils/stress_index.dart';
 
 
 class HealthcarePage extends StatefulWidget {
@@ -265,32 +266,7 @@ class _HealthcarePageState extends State<HealthcarePage> {
   }
 
   /// Compute stress index (0-100) from heart rate, sleep, and activity
-  int _calculateStressIndex() {
-    if (_todayMetrics.isEmpty) return 0;
-
-    int stressScore = 0;
-
-    /// Heart rate analysis
-    final avgHR = _todayMetrics.map((m) => m.heartRate).reduce((a, b) => a + b) / _todayMetrics.length;
-    if (avgHR > 100) stressScore += 30;
-    else if (avgHR > 80) stressScore += 15;
-    else stressScore += 5;
-
-    /// Sleep analysis
-    if (_todaySleep != null) {
-      if (_todaySleep!.qualityScore < 50) stressScore += 30;
-      else if (_todaySleep!.qualityScore < 70) stressScore += 15;
-      else stressScore += 5;
-    }
-
-    // Activity analysis
-    final totalSteps = _todayMetrics.fold<int>(0, (sum, m) => sum + m.steps);
-    if (totalSteps < 3000) stressScore += 20; // Insuffisant
-    else if (totalSteps > 20000) stressScore += 10; // Suractivité
-    else stressScore += 5; // Bon
-
-    return (stressScore * 0.7).toInt().clamp(0, 100);
-  }
+  int _calculateStressIndex() => calculateStressIndex(_todayMetrics, _todaySleep);
 
   /// Trigger AI analysis for today and save results
   Future<void> _analyzeNow() async {

@@ -294,7 +294,13 @@ Every container listens on port 8000 internally; map it to different host ports 
 
 ### 7. Tests
 
-The repository contains only the default Flutter template test in [`test/widget_test.dart`](test/widget_test.dart), which still targets the counter app and does not match the current UI. There are no backend tests yet. Static analysis is configured through [`analysis_options.yaml`](analysis_options.yaml):
+Flutter unit tests in [`test/`](test) cover the 0 to 100 stress index ([`lib/utils/stress_index.dart`](lib/utils/stress_index.dart)) and JSON parsing of the health models. They do not pump the app, so they run without Firebase or a generated `firebase_options.dart`:
+
+```bash
+flutter test
+```
+
+There are no backend tests yet. Static analysis is configured through [`analysis_options.yaml`](analysis_options.yaml):
 
 ```bash
 flutter analyze
@@ -358,10 +364,11 @@ StressOFF-app/
 │   ├── models/                 # Health and meal data models
 │   ├── pages/                  # Auth, home, healthcare, meal, coach, history, settings
 │   ├── services/               # API clients, Firebase, calendar, api_config.dart
+│   ├── utils/                  # Pure helpers (stress index)
 │   └── widgets/                # Daily summary meals chart
 ├── assets/images/              # Logo and screenshots
 ├── android/  ios/  web/  ...   # Flutter platform projects
-├── test/widget_test.dart
+├── test/                      # Flutter unit tests (stress index, model parsing)
 └── pubspec.yaml
 ```
 
