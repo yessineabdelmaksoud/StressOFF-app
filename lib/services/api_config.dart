@@ -18,5 +18,5 @@ const String healthServiceBaseUrl = String.fromEnvironment(
 
 const String eventServiceBaseUrl = String.fromEnvironment(
   'EVENT_SERVICE_URL',
-  defaultValue: 'http://eventservice.norwayeast.azurecontainer.io:8003',
+  defaultValue: 'http://eventservice.norwayeast.azurecontainer.io:8000',
 );

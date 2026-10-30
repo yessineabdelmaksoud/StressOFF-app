@@ -219,7 +219,7 @@ The Flutter app reads service URLs at build time via `--dart-define` (see [`lib/
 | `MEAL_SERVICE_URL` | Azure meal service on port 8000 |
 | `COACH_SERVICE_URL` | Azure coach service on port 8000 |
 | `HEALTH_SERVICE_URL` | Azure health service on port 8000 |
-| `EVENT_SERVICE_URL` | Azure event service on port 8003 |
+| `EVENT_SERVICE_URL` | Azure event service on port 8000 |
 
 Firebase credentials are not committed (`.gitignore` excludes `google-services.json`, `GoogleService-Info.plist` and `.env` files). `lib/main.dart` imports `firebase_options.dart`, which you generate for your own project:
 

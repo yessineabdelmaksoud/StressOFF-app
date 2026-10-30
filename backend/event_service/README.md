@@ -86,7 +86,7 @@ az container create \
   --dns-name-label eventservice \
   --location norwayeast \
   --cpu 1 --memory 1.5 \
-  --ports 8003 \
+  --ports 8000 \
   --environment-variables OPENROUTER_API_KEY=$env:OPENROUTER_API_KEY \
   --restart-policy Always
 ```
@@ -99,13 +99,13 @@ az container create \
 
 ## Service URL
 
-After deployment: `http://eventservice.norwayeast.azurecontainer.io:8003`
+After deployment: `http://eventservice.norwayeast.azurecontainer.io:8000`
 
 ## Testing
 
 **Health Check:**
 ```powershell
-Invoke-WebRequest -Uri "http://eventservice.norwayeast.azurecontainer.io:8003/health"
+Invoke-WebRequest -Uri "http://eventservice.norwayeast.azurecontainer.io:8000/health"
 ```
 
 **Test Event Recommendation:**
@@ -116,7 +116,7 @@ $body = @{
     endTime = "2025-11-17T11:00:00"
 } | ConvertTo-Json
 
-Invoke-RestMethod -Uri "http://eventservice.norwayeast.azurecontainer.io:8003/generate-event-recommendation" -Method POST -Body $body -ContentType "application/json"
+Invoke-RestMethod -Uri "http://eventservice.norwayeast.azurecontainer.io:8000/generate-event-recommendation" -Method POST -Body $body -ContentType "application/json"
 ```
 
 ## Monitoring
@@ -137,7 +137,7 @@ Update Flutter app's API configuration:
 
 ```dart
 // lib/services/api_config.dart
-const String eventServiceBaseUrl = 'http://eventservice.norwayeast.azurecontainer.io:8003';
+const String eventServiceBaseUrl = 'http://eventservice.norwayeast.azurecontainer.io:8000';
 ```
 
 Use in Flutter:
