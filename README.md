@@ -246,7 +246,7 @@ uvicorn backend.event_service.main:app  --host 0.0.0.0 --port 8003
 
 Run each `uvicorn` command in its own terminal. Interactive docs are at `http://127.0.0.1:<port>/docs`.
 
-On Windows, [`backend/start.ps1`](backend/start.ps1) creates a venv, installs a service's requirements and starts it (meal on 8000, coach on 8001, health on 8002):
+On Windows, [`backend/start.ps1`](backend/start.ps1) creates a venv, installs a service's requirements and starts it (meal on 8000, coach on 8001, health on 8002, event on 8003):
 
 ```powershell
 .\backend\start.ps1 -Service meal
@@ -351,7 +351,7 @@ StressOFF-app/
 │   ├── health_service/         # main.py, Dockerfile, requirements.txt
 │   ├── event_service/          # main.py, Dockerfile, requirements.txt, README.md
 │   ├── smartwatch_simulator.py # Writes simulated wearable data to Firestore
-│   ├── start.ps1               # Local launcher for meal / coach / health
+│   ├── start.ps1               # Local launcher for meal / coach / health / event
 │   └── requirements.txt        # Combined backend + simulator dependencies
 ├── lib/
 │   ├── main.dart               # Firebase init, notifications, app entry

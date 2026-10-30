@@ -1,5 +1,5 @@
 param(
-    [ValidateSet("meal", "coach", "health")]
+    [ValidateSet("meal", "coach", "health", "event")]
     [string]$Service = "meal"
 )
 
@@ -7,6 +7,7 @@ $servicePort = @{
     meal   = 8000
     coach  = 8001
     health = 8002
+    event  = 8003
 }[$Service]
 
 $serviceFolder = Join-Path $PSScriptRoot "${Service}_service"
