@@ -6,6 +6,7 @@
 
 **A multimodal wellness app that reads your wearable data, meal photos and calendar to explain your stress and nutrition, then talks it through with an AI coach.**
 
+[![CI](https://github.com/yessineabdelmaksoud/StressOFF-app/actions/workflows/ci.yml/badge.svg)](https://github.com/yessineabdelmaksoud/StressOFF-app/actions/workflows/ci.yml)
 ![Flutter](https://img.shields.io/badge/Flutter-Dart%20%E2%89%A53.3-02569B?logo=flutter&logoColor=white)
 ![Python](https://img.shields.io/badge/Python-3.12-3776AB?logo=python&logoColor=white)
 ![FastAPI](https://img.shields.io/badge/FastAPI-0.115-009688?logo=fastapi&logoColor=white)
@@ -300,7 +301,21 @@ Flutter unit tests in [`test/`](test) cover the 0 to 100 stress index ([`lib/uti
 flutter test
 ```
 
-There are no backend tests yet. Static analysis is configured through [`analysis_options.yaml`](analysis_options.yaml):
+Backend tests in [`backend/tests/`](backend/tests) call each service through FastAPI's `TestClient`. OpenRouter is mocked and real network access is blocked, so no API key is needed. They cover a happy path for every endpoint and the main error paths (missing key, upstream errors, invalid input), plus the shared helpers (`coerce_text`, `compress_image`, the meal prompt) and the health service's median. Run them from the repository root:
+
+```bash
+pip install -r backend/meal_service/requirements.txt -r backend/coach_service/requirements.txt \
+            -r backend/health_service/requirements.txt -r backend/event_service/requirements.txt \
+            -r backend/requirements-dev.txt
+ruff check backend
+pytest backend/tests
+```
+
+`ruff` only checks for real errors (syntax errors, undefined names; see [`backend/ruff.toml`](backend/ruff.toml)).
+
+[GitHub Actions](.github/workflows/ci.yml) runs both suites on every push and pull request to `main`: the backend job on Python 3.12, the Flutter job on Flutter 3.35.7.
+
+Static analysis is configured through [`analysis_options.yaml`](analysis_options.yaml). `flutter analyze` is not part of CI: without a generated `firebase_options.dart` it reports two errors in `lib/main.dart`, and the rest of its output is style lints.
 
 ```bash
 flutter analyze
@@ -350,6 +365,7 @@ More detail on the event service is in [`backend/event_service/README.md`](backe
 
 ```text
 StressOFF-app/
+├── .github/workflows/ci.yml    # Backend and Flutter CI
 ├── backend/
 │   ├── common/                 # Shared Pydantic models and helpers (image compression, prompts)
 │   ├── meal_service/           # main.py, Dockerfile, requirements.txt
@@ -357,7 +373,10 @@ StressOFF-app/
 │   ├── health_service/         # main.py, Dockerfile, requirements.txt
 │   ├── event_service/          # main.py, Dockerfile, requirements.txt, README.md
 │   ├── smartwatch_simulator.py # Writes simulated wearable data to Firestore
+│   ├── tests/                  # pytest suite (TestClient, OpenRouter mocked)
 │   ├── start.ps1               # Local launcher for meal / coach / health / event
+│   ├── ruff.toml               # Lint config (error rules only)
+│   ├── requirements-dev.txt    # pytest, httpx, ruff
 │   └── requirements.txt        # Combined backend + simulator dependencies
 ├── lib/
 │   ├── main.dart               # Firebase init, notifications, app entry
@@ -415,7 +434,7 @@ StressOFF is a challenge prototype. Known gaps, all visible in the code:
 - **Transport**: services are exposed over plain HTTP on ACI; HTTPS (Azure Front Door, Application Gateway or a reverse proxy) is not configured.
 - **Wearable integration**: health data comes from the smartwatch simulator; there is no Health Connect, HealthKit or vendor SDK integration yet.
 - **Free-tier models**: all calls use OpenRouter `:free` models, which are rate limited.
-- **Testing and CI**: no backend tests, an outdated Flutter template test, and no CI pipeline.
+- **Testing**: tests cover backend endpoints with the model mocked and pure Dart logic in the app; there are no widget, integration or end-to-end tests, and nothing exercises the real models.
 - **Medical disclaimer**: StressOFF gives general wellness guidance and is not a medical device.
 
 ---

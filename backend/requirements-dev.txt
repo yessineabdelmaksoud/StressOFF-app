@@ -1,0 +1,5 @@
+# Test and lint tools for the backend services (used by CI).
+# Install together with each service's requirements.txt.
+pytest==8.3.3
+httpx==0.27.2
+ruff==0.7.4

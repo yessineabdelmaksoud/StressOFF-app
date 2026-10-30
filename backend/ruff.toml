@@ -1,0 +1,7 @@
+# Lint only for real errors: syntax errors (E9), invalid comparisons (F63),
+# misplaced statements such as `return` outside a function (F7) and
+# undefined names (F82). Style rules are intentionally not enforced.
+target-version = "py312"
+
+[lint]
+select = ["E9", "F63", "F7", "F82"]
